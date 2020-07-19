@@ -11,16 +11,16 @@
             <div class="labelDiv">SUBID：</div>
             <Input v-model="SUBID" placeholder="SUBID" class="inputBox" />
             <div class="labelDiv">SCRIPTID：</div>
-            <!-- <Input v-model="value" placeholder="SCRIPTID" class="inputBox" /> -->
+            <Input v-model="value" placeholder="SCRIPTID" class="inputBox" />
 
             <div class="title">购买</div>
             <div class="labelDiv">地区：</div>
-            <!-- <Select v-model="location" class="inputBox">
+            <Select v-model="location" class="inputBox">
               <Option
-                v-for="item in cityList"
-                :value="item.value"
-                :key="item.value"
-              >{{ item.label }}</Option>
+                v-for="item in location"
+                :value="item[0].name"
+                :key="item[0]"
+              >{{ item.name }}</Option>
             </Select>
             <div class="labelDiv">金额：</div>
             <Select v-model="money" class="inputBox">
@@ -29,7 +29,7 @@
                 :value="item.value"
                 :key="item.value"
               >{{ item.label }}</Option>
-            </Select> -->
+            </Select>
             <Button type="success" long style="margin:10px;">一键生成翻墙服务器</Button>
             <Row>
               <Col span="12">
@@ -47,12 +47,7 @@
           </Card>
         </Col>
         <Col span="12" style="margin-left:50px">
-          <Input v-model="status" placeholder="SCRIPTID" class="inputBox" />
-          {{status}}
-          <Card style="width=100%;height=100%;" v-for="(index,item) in status" :key="index">
-              {{item}}
-          </Card>
-          
+          <Card style="width=100%;height=100%;" v-for="(index,item) in status" :key="index">{{item}}</Card>
         </Col>
       </Row>
     </Card>
@@ -65,7 +60,7 @@ export default {
   name: "wallmanage",
   data() {
     return {
-      status: "123",
+      status: {},
       APIKEY: "",
       SUBID: "",
       location: "",
@@ -73,13 +68,7 @@ export default {
     };
   },
   methods: {
-    searchServer: (APIKEY,status) => {
-      var _this = this;
-      console.log(status);
-      this.status="456";
-      console.log(this);
-      _this.$forceUpdate();
-      console.log(status);
+    searchServer(APIKEY, status) {
       if (typeof APIKEY == "undefined" || APIKEY == null || APIKEY == "") {
         alert("请输入APIKEY");
       } else {
@@ -92,12 +81,33 @@ export default {
           }
         }).then(res => {
           alert(res.data);
-          _this.status = res.data;
-          console.log(_this);
-          console.log(_this.status);
+          this.status = res.data;
+          console.log(this.status);
         });
       }
+    },
+    getCountry() {
+      axios({
+        url: "/api/regions/list",
+        method: "get"
+      }).then(res => {
+        this.location = res.data;
+        console.log(this.location);
+      });
+    },
+    getServerPlan() {
+      axios({
+        url: "/api/plans/list?type=vc2",
+        method: "get"
+      }).then(res => {
+        this.money = res.data;
+        console.log(this.money);
+      });
     }
+  },
+  mounted() {
+    this.getCountry();
+    this.getServerPlan();
   }
 };
 </script>
