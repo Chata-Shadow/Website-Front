@@ -9,7 +9,7 @@
             <div class="labelDiv">API KEY：</div>
             <Input v-model="APIKEY" placeholder="API KEY" class="inputBox" />
             <!-- <div class="labelDiv">SUBID：</div>
-            <Input v-model="SUBID" placeholder="SUBID" class="inputBox" /> -->
+            <Input v-model="SUBID" placeholder="SUBID" class="inputBox" />-->
             <!-- <div class="labelDiv">SCRIPTID：</div>
             <Input v-model="value" placeholder="SCRIPTID" class="inputBox" />-->
 
@@ -26,7 +26,7 @@
                 :key="key"
               >{{item.price_per_month}}</Option>
             </Select>
-            <Button type="success" long style="margin:10px;">一键生成翻墙服务器</Button>
+            <Button type="success" long style="margin:10px;" @click="generalByone(APIKEY)">一键生成翻墙服务器</Button>
             <Row>
               <Col span="12">
                 <Button
@@ -40,7 +40,7 @@
                 <Button type="success">我要自己生成</Button>
               </Col>
               <Col span="6">
-                <Button type="error">删除所有服务器</Button>
+                <Button type="error" @click="deleteAll(APIKEY)">删除选中的服务器</Button>
               </Col>
             </Row>
           </Card>
@@ -48,21 +48,31 @@
         </Col>
 
         <Col span="14" style="margin-left:100px;">
-          <Card class="statusclass" v-for="(item,index) in status" :key="index">
-            <Row>
-              <Col span="6">
-                <Icon type="ios-globe" size="50" color="green" style="margin-top:28px"/>
-              </Col>
-              <Col span="18">
-                <div class="labelDiv" style="font-size:48px">{{item.main_ip}}</div>
-                <div class="labelDiv" style="width:500px">
-                  服务器当前状态：
-                  <span style="color:green;">{{item.power_status}}</span>
+          <CheckboxGroup v-model="deleteSelect">
+            <Card class="statusclass" v-for="(item,index) in status" :key="index">
+              <Row>
+                <Col span="6">
+                  <Icon type="ios-globe" size="50" color="green" style="margin-top:28px" />
+                </Col>
+                <Col span="12">
+                  <div class="labelDiv" style="font-size:48px;width:500px">{{item.main_ip}}</div>
+                  <div class="labelDiv" style="width:500px">
+                    服务器当前状态：
+                    <span style="color:green;">{{item.power_status}}</span>
+                  </div>
+                  <div class="labelDiv">服务器密码:{{item.default_password}}</div>
+                  
+                </Col>
+                <Col span="6">
+                <div style="width:100px;height:100px;margin-right:10px;margin-left:200px">
+                <Checkbox :label="item.SUBID">
+                  <span></span>
+                </Checkbox>
                 </div>
-                <div class="labelDiv">服务器密码:{{item.default_password}}</div>
-              </Col>
-            </Row>
-          </Card>
+                </Col>
+              </Row>
+            </Card>
+          </CheckboxGroup>
         </Col>
       </Row>
     </Card>
@@ -81,7 +91,8 @@ export default {
       location: "",
       money: "",
       localValue: "Los Angeles",
-      moneyValue: "5.00"
+      moneyValue: "5.00",
+      deleteSelect:[]
     };
   },
   methods: {
@@ -116,6 +127,83 @@ export default {
       }).then(res => {
         this.money = res.data;
       });
+    },
+    generalByone(APIKEY) {
+      var region = "5";
+      var account = "202";
+      axios({
+        url: "/api/server/create",
+        method: "post",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "API-Key": APIKEY
+        },
+        transformRequest: [
+          function(data) {
+            // Do whatever you want to transform the data
+            let ret = "";
+            for (let it in data) {
+              // 如果要发送中文 编码
+              ret +=
+                encodeURIComponent(it) +
+                "=" +
+                encodeURIComponent(data[it]) +
+                "&";
+            }
+            return ret;
+          }
+        ],
+        data: {
+          DCID: region,
+          VPSPLANID: account,
+          OSID: "362"
+        }
+      }).then(
+        res => {
+          this.money = res.data;
+        },
+        res => {
+          alert(res);
+        }
+      );
+    },
+    deleteAll(APIKEY) {
+      var deleteSelect = this.deleteSelect
+      for (var item in this.deleteSelect) {
+        axios({
+          url: "/api/server/destroy",
+          method: "post",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "API-Key": APIKEY
+          },
+          transformRequest: [
+            function(data) {
+              // Do whatever you want to transform the data
+              let ret = "";
+              for (let it in data) {
+                // 如果要发送中文 编码
+                ret +=
+                  encodeURIComponent(it) +
+                  "=" +
+                  encodeURIComponent(data[it]) +
+                  "&";
+              }
+              return ret;
+            }
+          ],
+          data: {
+            SUBID: deleteSelect[item]
+          }
+        }).then(
+          res => {
+            alert("服务器删除成功");
+          },
+          res => {
+            alert("删除失败");
+          }
+        );
+      }
     }
   },
   mounted() {
@@ -136,7 +224,7 @@ export default {
 .labelDiv {
   text-align: left;
   margin-left: 10px;
-  word-wrap:break-word;
+  word-wrap: break-word;
   width: 100%;
 }
 
@@ -151,7 +239,7 @@ export default {
   display: flex;
   justify-content: flex-start;
 }
-.ivu-card-body{
-  width: 100% ;
+.ivu-card-body {
+  width: 100%;
 }
 </style>
