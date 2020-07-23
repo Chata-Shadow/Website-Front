@@ -14,6 +14,10 @@
             <Input v-model="value" placeholder="SCRIPTID" class="inputBox" />-->
 
             <div class="title">购买</div>
+            <div class="labelDiv">SCRIPT：</div>
+            <Select v-model="scriptValue" class="inputBox">
+              <Option v-for="(item,key) in script" :value="item.SCRIPTID" :key="key">{{item.name}}</Option>
+            </Select>
             <div class="labelDiv">地区：</div>
             <Select v-model="localValue" class="inputBox">
               <Option v-for="(item,key) in location" :value="item.name" :key="key">{{item.name}}</Option>
@@ -37,7 +41,7 @@
                 >刷新服务器状态</Button>
               </Col>
               <Col span="6">
-                <Button type="success">我要自己生成</Button>
+                <Button type="success" @click="generalByMy(APIKEY)">我要自己生成</Button>
               </Col>
               <Col span="6">
                 <Button type="error" @click="deleteAll(APIKEY)">删除选中的服务器</Button>
@@ -61,14 +65,13 @@
                     <span style="color:green;">{{item.power_status}}</span>
                   </div>
                   <div class="labelDiv">服务器密码:{{item.default_password}}</div>
-                  
                 </Col>
                 <Col span="6">
-                <div style="width:100px;height:100px;margin-right:10px;margin-left:200px">
-                <Checkbox :label="item.SUBID">
-                  <span></span>
-                </Checkbox>
-                </div>
+                  <div style="width:100px;height:100px;margin-right:10px;margin-left:200px">
+                    <Checkbox :label="item.SUBID">
+                      <span></span>
+                    </Checkbox>
+                  </div>
                 </Col>
               </Row>
             </Card>
@@ -92,7 +95,9 @@ export default {
       money: "",
       localValue: "Los Angeles",
       moneyValue: "5.00",
-      deleteSelect:[]
+      deleteSelect: [],
+      script: "",
+      scriptValue:""
     };
   },
   methods: {
@@ -129,7 +134,7 @@ export default {
       });
     },
     generalByone(APIKEY) {
-      var region = "5";
+      var region = "6";
       var account = "202";
       axios({
         url: "/api/server/create",
@@ -156,7 +161,8 @@ export default {
         data: {
           DCID: region,
           VPSPLANID: account,
-          OSID: "362"
+          OSID: "362",
+          SCRIPTID:"733180"
         }
       }).then(
         res => {
@@ -168,7 +174,7 @@ export default {
       );
     },
     deleteAll(APIKEY) {
-      var deleteSelect = this.deleteSelect
+      var deleteSelect = this.deleteSelect;
       for (var item in this.deleteSelect) {
         axios({
           url: "/api/server/destroy",
@@ -204,11 +210,67 @@ export default {
           }
         );
       }
+    },
+    getScript() {
+      var APIKEY = this.APIKEY;
+      console.log(this.APIKEY);
+      axios({
+        url: "/api/startupscript/list",
+        method: "get",
+        headers: {
+          "API-Key": "ELKB2QVCJC4TBK2ABY44T2DTKV3OPT24HRGQ"
+        }
+      }).then(res => {
+        this.script = res.data;
+        let keys = Object.keys(this.script);
+        this.scriptValue = this.script[keys[0]].SCRIPTID;
+      });
+    },
+    generalByMy(){
+      var region = "5";
+      var account = "202";
+      axios({
+        url: "/api/server/create",
+        method: "post",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "API-Key": APIKEY
+        },
+        transformRequest: [
+          function(data) {
+            // Do whatever you want to transform the data
+            let ret = "";
+            for (let it in data) {
+              // 如果要发送中文 编码
+              ret +=
+                encodeURIComponent(it) +
+                "=" +
+                encodeURIComponent(data[it]) +
+                "&";
+            }
+            return ret;
+          }
+        ],
+        data: {
+          DCID: region,
+          VPSPLANID: account,
+          OSID: "362",
+          SCRIPTID:"733180"
+        }
+      }).then(
+        res => {
+          this.money = res.data;
+        },
+        res => {
+          alert(res);
+        }
+      );
     }
   },
   mounted() {
     this.getCountry();
     this.getServerPlan();
+    this.getScript();
   }
 };
 </script>
