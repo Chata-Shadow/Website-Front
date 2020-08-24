@@ -39,13 +39,13 @@ module.exports = {
   // 设为false打包时不生成.map文件
   productionSourceMap: false,
   devServer: {
-    proxy:{
-    '/api': {
-      target: 'https://api.vultr.com/v1',
-      pathRewrite:{
-        '^/api':'/'
+    proxy: {
+      '/api': {
+        target: 'https://api.vultr.com/v1',
+        pathRewrite: {
+          '^/api': '/'
+        }
       }
     }
-  }
   }
 }

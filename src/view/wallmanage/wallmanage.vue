@@ -81,203 +81,203 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios'
 export default {
-  name: "wallmanage",
-  data() {
+  name: 'wallmanage',
+  data () {
     return {
       status: {},
-      APIKEY: "",
-      SUBID: "",
-      location: "",
-      money: "",
-      localValue: "",
-      moneyValue: "",
+      APIKEY: '',
+      SUBID: '',
+      location: '',
+      money: '',
+      localValue: '',
+      moneyValue: '',
       deleteSelect: [],
-      script: "",
-      scriptValue: "",
-    };
+      script: '',
+      scriptValue: ''
+    }
   },
   methods: {
-    searchServer() {
+    searchServer () {
       if (
-        typeof this.APIKEY == "undefined" ||
+        typeof this.APIKEY === 'undefined' ||
         this.APIKEY == null ||
-        this.APIKEY == ""
+        this.APIKEY == ''
       ) {
-        alert("请输入APIKEY");
+        alert('请输入APIKEY')
       } else {
         axios({
-          url: "/api/server/list",
-          method: "get",
+          url: '/api/server/list',
+          method: 'get',
           headers: {
-            "Access-Control-Allow-Origin": "*",
-            "API-Key": this.APIKEY,
-          },
+            'Access-Control-Allow-Origin': '*',
+            'API-Key': this.APIKEY
+          }
         }).then((res) => {
-          this.status = res.data;
-        });
+          this.status = res.data
+        })
       }
     },
-    getCountry() {
+    getCountry () {
       axios({
-        url: "/api/regions/list",
-        method: "get",
+        url: '/api/regions/list',
+        method: 'get'
       }).then((res) => {
-        this.location = res.data;
-        let keys = Object.keys(this.location);
-        this.localValue = this.location[keys[0]].DCID;
-      });
+        this.location = res.data
+        let keys = Object.keys(this.location)
+        this.localValue = this.location[keys[0]].DCID
+      })
     },
-    getServerPlan() {
+    getServerPlan () {
       axios({
-        url: "/api/plans/list?type=vc2",
-        method: "get",
+        url: '/api/plans/list?type=vc2',
+        method: 'get'
       }).then((res) => {
-        this.money = res.data;
-        let keys = Object.keys(this.money);
-        this.moneyValue = this.money[keys[0]].VPSPLANID;
-      });
+        this.money = res.data
+        let keys = Object.keys(this.money)
+        this.moneyValue = this.money[keys[0]].VPSPLANID
+      })
     },
-    generalByone(APIKEY) {
-      var region = "6";
-      var account = "202";
+    generalByone (APIKEY) {
+      var region = '6'
+      var account = '202'
       axios({
-        url: "/api/server/create",
-        method: "post",
+        url: '/api/server/create',
+        method: 'post',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "API-Key": APIKEY,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'API-Key': APIKEY
         },
         transformRequest: [
           function (data) {
             // Do whatever you want to transform the data
-            let ret = "";
+            let ret = ''
             for (let it in data) {
               // 如果要发送中文 编码
               ret +=
                 encodeURIComponent(it) +
-                "=" +
+                '=' +
                 encodeURIComponent(data[it]) +
-                "&";
+                '&'
             }
-            return ret;
-          },
+            return ret
+          }
         ],
         data: {
           DCID: region,
           VPSPLANID: account,
-          OSID: "362",
-          SCRIPTID: "733180",
-        },
+          OSID: '362',
+          SCRIPTID: '733180'
+        }
       }).then(
         (res) => {
-          localStorage.setItem("APIKEY", APIKEY);
-          searchServer();
+          localStorage.setItem('APIKEY', APIKEY)
+          searchServer()
         },
         (res) => {
-          alert(res);
+          alert(res)
         }
-      );
+      )
     },
-    deleteAll(APIKEY) {
-      var deleteSelect = this.deleteSelect;
+    deleteAll (APIKEY) {
+      var deleteSelect = this.deleteSelect
       for (var item in this.deleteSelect) {
         axios({
-          url: "/api/server/destroy",
-          method: "post",
+          url: '/api/server/destroy',
+          method: 'post',
           headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-            "API-Key": APIKEY,
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'API-Key': APIKEY
           },
           transformRequest: [
             function (data) {
               // Do whatever you want to transform the data
-              let ret = "";
+              let ret = ''
               for (let it in data) {
                 // 如果要发送中文 编码
                 ret +=
                   encodeURIComponent(it) +
-                  "=" +
+                  '=' +
                   encodeURIComponent(data[it]) +
-                  "&";
+                  '&'
               }
-              return ret;
-            },
+              return ret
+            }
           ],
           data: {
-            SUBID: deleteSelect[item],
-          },
+            SUBID: deleteSelect[item]
+          }
         }).then(
           (res) => {},
           (res) => {
-            alert("删除失败");
+            alert('删除失败')
           }
-        );
+        )
       }
-      searchServer();
+      searchServer()
     },
-    getScript() {
-      var APIKEY = this.APIKEY;
-      console.log(this.APIKEY);
+    getScript () {
+      var APIKEY = this.APIKEY
+      console.log(this.APIKEY)
       axios({
-        url: "/api/startupscript/list",
-        method: "get",
+        url: '/api/startupscript/list',
+        method: 'get',
         headers: {
-          "API-Key": "ELKB2QVCJC4TBK2ABY44T2DTKV3OPT24HRGQ",
-        },
+          'API-Key': 'ELKB2QVCJC4TBK2ABY44T2DTKV3OPT24HRGQ'
+        }
       }).then((res) => {
-        this.script = res.data;
-        let keys = Object.keys(this.script);
-        this.scriptValue = this.script[keys[0]].SCRIPTID;
-      });
+        this.script = res.data
+        let keys = Object.keys(this.script)
+        this.scriptValue = this.script[keys[0]].SCRIPTID
+      })
     },
-    generalByMy() {
+    generalByMy () {
       axios({
-        url: "/api/server/create",
-        method: "post",
+        url: '/api/server/create',
+        method: 'post',
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "API-Key": this.APIKEY,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'API-Key': this.APIKEY
         },
         transformRequest: [
           function (data) {
             // Do whatever you want to transform the data
-            let ret = "";
+            let ret = ''
             for (let it in data) {
               // 如果要发送中文 编码
               ret +=
                 encodeURIComponent(it) +
-                "=" +
+                '=' +
                 encodeURIComponent(data[it]) +
-                "&";
+                '&'
             }
-            return ret;
-          },
+            return ret
+          }
         ],
         data: {
           DCID: this.localValue,
           VPSPLANID: this.moneyValue,
-          OSID: "362",
-          SCRIPTID: this.scriptValue,
-        },
+          OSID: '362',
+          SCRIPTID: this.scriptValue
+        }
       }).then(
         (res) => {
-          searchServer();
+          searchServer()
         },
         (res) => {
-          alert(res);
+          alert(res)
         }
-      );
-    },
+      )
+    }
   },
-  mounted() {
-    this.APIKEY = localStorage.getItem("APIKEY");
-    this.getCountry();
-    this.getServerPlan();
-    this.getScript();
-  },
-};
+  mounted () {
+    this.APIKEY = localStorage.getItem('APIKEY')
+    this.getCountry()
+    this.getServerPlan()
+    this.getScript()
+  }
+}
 </script>
 
 <style scoped>

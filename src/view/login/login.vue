@@ -16,14 +16,14 @@
 </template>
 
 <script>
-import LoginForm from "_c/login-form";
-import { mapActions } from "vuex";
+import LoginForm from '_c/login-form'
+import { mapActions } from 'vuex'
 export default {
   components: {
-    LoginForm,
+    LoginForm
   },
   methods: {
-    ...mapActions(["handleLogin", "getUserInfo"]),
+    ...mapActions(['handleLogin', 'getUserInfo']),
     handleSubmit ({ userName, password }) {
       this.handleLogin({ userName, password }).then(res => {
         this.getUserInfo().then(res => {
@@ -33,8 +33,8 @@ export default {
         })
       })
     }
-  },
-};
+  }
+}
 </script>
 
 <style>
